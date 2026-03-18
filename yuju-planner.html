@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>유주플래너</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Noto+Serif+KR:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #FAF7F2;
+    --warm: #EDE5D8;
+    --gold: #B89B72;
+    --dark: #2A2420;
+    --muted: #8C7B6B;
+  }
+
+  body {
+    background: var(--cream);
+    color: var(--dark);
+    font-family: 'Noto Serif KR', serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+  }
+
+  /* 배경 장식 */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -20%;
+    right: -10%;
+    width: 60vw;
+    height: 60vw;
+    border-radius: 50%;
+    background: radial-gradient(circle, #E8D9C5 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    bottom: -15%;
+    left: -10%;
+    width: 45vw;
+    height: 45vw;
+    border-radius: 50%;
+    background: radial-gradient(circle, #DDD0BE 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    width: min(600px, 90vw);
+    padding: 4rem 0;
+    text-align: center;
+    animation: fadeUp 1.2s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* 상단 장식선 */
+  .deco-top {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 3rem;
+    animation: fadeUp 1.2s ease 0.1s both;
+  }
+  .deco-top .line {
+    width: 60px;
+    height: 0.5px;
+    background: var(--gold);
+  }
+  .deco-top .diamond {
+    width: 6px;
+    height: 6px;
+    background: var(--gold);
+    transform: rotate(45deg);
+  }
+
+  /* 로고 / 이름 */
+  .brand {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.8rem, 8vw, 4.5rem);
+    font-weight: 300;
+    letter-spacing: 0.12em;
+    color: var(--dark);
+    line-height: 1.1;
+    animation: fadeUp 1.2s ease 0.2s both;
+  }
+  .brand em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  /* 구분선 */
+  .divider {
+    width: 40px;
+    height: 0.5px;
+    background: var(--gold);
+    margin: 1.8rem auto;
+    animation: expand 1.2s ease 0.5s both;
+  }
+  @keyframes expand {
+    from { width: 0; opacity: 0; }
+    to   { width: 40px; opacity: 1; }
+  }
+
+  /* 태그라인 */
+  .tagline {
+    font-size: 0.78rem;
+    font-weight: 300;
+    letter-spacing: 0.28em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+    animation: fadeUp 1.2s ease 0.35s both;
+  }
+
+  /* 소개 문구 */
+  .description {
+    font-size: 1rem;
+    font-weight: 200;
+    color: var(--muted);
+    line-height: 2;
+    letter-spacing: 0.04em;
+    max-width: 420px;
+    margin: 0 auto 3rem;
+    animation: fadeUp 1.2s ease 0.45s both;
+  }
+
+  /* 카드 3개 */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--warm);
+    border: 0.5px solid var(--warm);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 3rem;
+    animation: fadeUp 1.2s ease 0.55s both;
+  }
+  .card {
+    background: var(--cream);
+    padding: 1.6rem 1rem;
+    transition: background 0.3s;
+  }
+  .card:hover { background: var(--warm); }
+  .card .icon {
+    font-size: 1.3rem;
+    margin-bottom: 0.6rem;
+    display: block;
+  }
+  .card .label {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 0.3rem;
+  }
+  .card .value {
+    font-size: 0.82rem;
+    color: var(--dark);
+    font-weight: 300;
+    line-height: 1.5;
+  }
+
+  /* CTA 버튼 */
+  .cta {
+    display: inline-block;
+    font-family: 'Noto Serif KR', serif;
+    font-size: 0.72rem;
+    font-weight: 300;
+    letter-spacing: 0.25em;
+    color: var(--dark);
+    text-decoration: none;
+    border-bottom: 0.5px solid var(--gold);
+    padding-bottom: 4px;
+    transition: color 0.3s, border-color 0.3s;
+    animation: fadeUp 1.2s ease 0.65s both;
+  }
+  .cta:hover { color: var(--gold); }
+
+  /* 연락처 */
+  .contact {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    margin-bottom: 2.5rem;
+    animation: fadeUp 1.2s ease 0.65s both;
+  }
+  .contact-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--dark);
+    transition: color 0.3s;
+  }
+  .contact-item:hover { color: var(--gold); }
+  .contact-item .c-label {
+    font-size: 0.63rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    min-width: 52px;
+    text-align: right;
+  }
+  .contact-item .c-line {
+    width: 0.5px;
+    height: 12px;
+    background: var(--warm);
+  }
+  .contact-item .c-value {
+    font-size: 0.85rem;
+    font-weight: 300;
+    letter-spacing: 0.06em;
+  }
+
+  /* 상담 신청 섹션 */
+  .form-section {
+    margin-top: 3.5rem;
+    text-align: left;
+  }
+  .form-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+  .form-title .line { width: 40px; height: 0.5px; background: var(--warm); }
+  .form-title span {
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+
+  .form-group {
+    margin-bottom: 1.4rem;
+  }
+  .form-group label {
+    display: block;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 0.5px solid var(--warm);
+    padding: 0.5rem 0;
+    font-family: 'Noto Serif KR', serif;
+    font-size: 0.88rem;
+    font-weight: 300;
+    color: var(--dark);
+    outline: none;
+    transition: border-color 0.3s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .form-group input:focus,
+  .form-group select:focus { border-bottom-color: var(--gold); }
+  .form-group input::placeholder { color: var(--warm); }
+  .form-group select option { color: var(--dark); background: var(--cream); }
+  .form-group select.placeholder { color: var(--warm); }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+  }
+
+  /* 날짜 슬롯 선택 */
+  .slot-group { margin-bottom: 1.4rem; }
+  .slot-group label {
+    display: block;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 0.8rem;
+  }
+  .slot-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 0.8rem;
+  }
+  .slot-tab {
+    flex: 1;
+    padding: 0.5rem;
+    background: transparent;
+    border: 0.5px solid var(--warm);
+    border-radius: 2px;
+    font-family: 'Noto Serif KR', serif;
+    font-size: 0.78rem;
+    font-weight: 300;
+    color: var(--muted);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+  }
+  .slot-tab.active {
+    border-color: var(--gold);
+    color: var(--dark);
+    background: var(--warm);
+  }
+  .time-slots {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+  .time-slot {
+    padding: 0.45rem 0;
+    background: transparent;
+    border: 0.5px solid var(--warm);
+    border-radius: 2px;
+    font-family: 'Noto Serif KR', serif;
+    font-size: 0.75rem;
+    font-weight: 300;
+    color: var(--muted);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+  }
+  .time-slot:hover { border-color: var(--gold); color: var(--dark); }
+  .time-slot.selected { background: var(--gold); border-color: var(--gold); color: #fff; }
+
+  .submit-btn {
+    width: 100%;
+    margin-top: 2rem;
+    padding: 1rem;
+    background: var(--dark);
+    border: none;
+    border-radius: 2px;
+    font-family: 'Noto Serif KR', serif;
+    font-size: 0.75rem;
+    font-weight: 300;
+    letter-spacing: 0.25em;
+    color: var(--cream);
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  .submit-btn:hover { background: var(--gold); }
+
+  .success-msg {
+    display: none;
+    text-align: center;
+    padding: 2rem;
+    border: 0.5px solid var(--warm);
+    border-radius: 2px;
+    margin-top: 1rem;
+  }
+  .success-msg .s-icon { font-size: 1.6rem; margin-bottom: 0.8rem; }
+  .success-msg p { font-size: 0.85rem; font-weight: 300; color: var(--muted); line-height: 1.8; }
+
+  /* 하단 */
+  .footer {
+    margin-top: 3.5rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    color: var(--warm);
+    animation: fadeUp 1.2s ease 0.75s both;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="deco-top">
+    <span class="line"></span>
+    <span class="diamond"></span>
+    <span class="line"></span>
+  </div>
+
+  <p class="tagline">Wedding Planner</p>
+
+  <h1 class="brand">유주<em>플래너</em></h1>
+
+  <div class="divider"></div>
+
+  <p class="description">
+    당신만을 위한 웨딩플래너<br>
+    예산, 일정, 취향과 로망에 맞춘<br>
+    당신만을 위한 웨딩 프로젝트 PM입니다
+  </p>
+
+  <div class="cards">
+    <div class="card">
+      <span class="icon">💍</span>
+      <p class="label">맞춤 기획</p>
+      <p class="value">예산 & 일정<br>완벽 조율</p>
+    </div>
+    <div class="card">
+      <span class="icon">✨</span>
+      <p class="label">취향 반영</p>
+      <p class="value">당신의 로망을<br>현실로</p>
+    </div>
+    <div class="card">
+      <span class="icon">🌸</span>
+      <p class="label">전담 PM</p>
+      <p class="value">처음부터 끝까지<br>함께합니다</p>
+    </div>
+  </div>
+
+  <div class="contact">
+    <a class="contact-item" href="tel:01039405853">
+      <span class="c-label">Phone</span>
+      <span class="c-line"></span>
+      <span class="c-value">010 · 3940 · 5853</span>
+    </a>
+    <a class="contact-item" href="https://open.kakao.com/o/withyou5853" target="_blank">
+      <span class="c-label">Kakao</span>
+      <span class="c-line"></span>
+      <span class="c-value">withyou.5853</span>
+    </a>
+    <a class="contact-item" href="https://www.instagram.com/weddingday_everything/" target="_blank">
+      <span class="c-label">Instagram</span>
+      <span class="c-line"></span>
+      <span class="c-value">@weddingday_everything</span>
+    </a>
+  </div>
+
+  <a class="cta" href="tel:01039405853">상담 문의하기</a>
+
+  <!-- 상담 신청 폼 -->
+  <div class="form-section">
+    <div class="form-title">
+      <span class="line"></span>
+      <span>상담 신청</span>
+      <span class="line"></span>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>신부 이름</label>
+        <input type="text" id="bride" placeholder="성함을 입력해주세요">
+      </div>
+      <div class="form-group">
+        <label>신랑 이름</label>
+        <input type="text" id="groom" placeholder="성함을 입력해주세요">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>연락처</label>
+      <input type="tel" id="phone" placeholder="010 - 0000 - 0000">
+    </div>
+
+    <div class="form-group">
+      <label>예식 희망 일정</label>
+      <input type="month" id="wedding-date" style="color: var(--dark);">
+    </div>
+
+    <div class="form-group">
+      <label>예식 희망 지역</label>
+      <select id="region" class="placeholder" onchange="this.classList.remove('placeholder')">
+        <option value="" disabled selected>지역을 선택해주세요</option>
+        <option>서울</option>
+        <option>경기 · 인천</option>
+        <option>부산</option>
+        <option>대구</option>
+        <option>대전</option>
+        <option>광주</option>
+        <option>제주</option>
+        <option>기타 (직접 상담)</option>
+      </select>
+    </div>
+
+    <!-- 상담 날짜 슬롯 -->
+    <div class="slot-group">
+      <label>상담 가능 일정 선택</label>
+      <div class="slot-tabs" id="day-tabs"></div>
+      <div class="time-slots" id="time-slots"></div>
+    </div>
+
+    <button class="submit-btn" onclick="submitForm()">상담 신청하기</button>
+
+    <div class="success-msg" id="success">
+      <div class="s-icon">🌸</div>
+      <p id="success-text"></p>
+    </div>
+  </div>
+
+  <p class="footer">YUJU PLANNER &nbsp;·&nbsp; YOUR WEDDING PROJECT</p>
+
+</div>
+
+<script>
+  let selectedDay = null;
+  let selectedTime = null;
+
+  // 이번주 + 다음주 토·일 구하기
+  function getWeekends() {
+    const today = new Date();
+    const days = [];
+    for (let i = 0; i <= 13; i++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() + i);
+      if (d.getDay() === 6 || d.getDay() === 0) days.push(d);
+    }
+    return days.slice(0, 2); // 이번주 토일만
+  }
+
+  function fmt(d) {
+    const m = d.getMonth() + 1;
+    const day = d.getDate();
+    const dow = ['일', '월', '화', '수', '목', '금', '토'][d.getDay()];
+    return `${m}/${day} (${dow})`;
+  }
+
+  // 날짜 탭 렌더
+  const weekends = getWeekends();
+  const tabsEl = document.getElementById('day-tabs');
+  weekends.forEach((d, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'slot-tab';
+    btn.textContent = fmt(d);
+    btn.onclick = () => {
+      document.querySelectorAll('.slot-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedDay = fmt(d);
+      selectedTime = null;
+      document.querySelectorAll('.time-slot').forEach(b => b.classList.remove('selected'));
+    };
+    tabsEl.appendChild(btn);
+  });
+
+  // 시간 슬롯 렌더 (11시~18시)
+  const timesEl = document.getElementById('time-slots');
+  for (let h = 11; h <= 18; h++) {
+    const btn = document.createElement('button');
+    btn.className = 'time-slot';
+    btn.textContent = `${h}:00`;
+    btn.onclick = () => {
+      document.querySelectorAll('.time-slot').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedTime = `${h}:00`;
+    };
+    timesEl.appendChild(btn);
+  }
+
+  function submitForm() {
+    const bride = document.getElementById('bride').value.trim();
+    const groom = document.getElementById('groom').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const wdate = document.getElementById('wedding-date').value;
+    const region = document.getElementById('region').value;
+
+    if (!bride && !groom) return alert('신부 또는 신랑 이름을 입력해주세요.');
+    if (!phone) return alert('연락처를 입력해주세요.');
+    if (!wdate) return alert('예식 희망 일정을 선택해주세요.');
+    if (!region) return alert('예식 희망 지역을 선택해주세요.');
+    if (!selectedDay) return alert('상담 날짜를 선택해주세요.');
+    if (!selectedTime) return alert('상담 시간을 선택해주세요.');
+
+    const name = [bride, groom].filter(Boolean).join(' · ');
+    const [y, m] = wdate.split('-');
+    document.getElementById('success-text').innerHTML =
+      `${name} 고객님, 상담 신청이 완료되었습니다.<br><br>` +
+      `📅 상담 일정 &nbsp; ${selectedDay} ${selectedTime}<br>` +
+      `💒 예식 희망 &nbsp; ${y}년 ${m}월 · ${region}<br><br>` +
+      `확인 후 연락처로 안내드리겠습니다. 🌸`;
+
+    document.querySelector('.submit-btn').style.display = 'none';
+    document.getElementById('success').style.display = 'block';
+  }
+</script>
